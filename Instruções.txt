@@ -1,0 +1,135 @@
+1 - Criar o AdminController para a route Dashboard
+
+2 - Crar as pastas 'backend' e 'frontend' dentro de 'public' para copiar os assets
+
+3 - Em resources > views criar a pasta 'admin' e a página index.blade.php
+
+4 - Dentro desta pasta 'admin' criar a pasta 'layouts' e as páginas app , header, navbar, sidebar, footer e scripts.
+
+5 - Substituir as páginas de 'login' e 'register' pelas do tema
+
+6 - rodar a migration
+
+7 - Fatiar o template que herdará de 'admin.app'
+
+8 - Criar os Models, Controllers, Migrations e Routes para Roles e  Migrations e Routes para Permissions (resource)   sail artisan make:model Role -cmr / sail artisan make:model Permission -m
+
+9 - Criar a migration role_permission  sail artisan make:migration create_role_permission_table
+
+10 - Criar o UserController resource
+
+11 - Modificar a migration user adicionando relacionamento com Role, depois modifica-lo para ser a ultima criada. Incluir esta campo no Model User
+
+11 - Criar a função role(belongsTo) no Model User   
+
+13 - Criar a função users(hasMany) no Model Role
+
+14 - Criar a função Permissions(hasMany) no Model Role
+
+15 - Criar Seeder Admin e User
+
+16 - Criar as paginas de User e Role 
+
+17 - Criar uma função para assossiar as permissões às funções no RoleController
+
+    public function assign_permissions(Request $request , Role $role){
+        
+        $role->permissions()->sync($request->permissions);
+    }
+
+18 - No Model Role criar a função hasPermission()
+
+    public function hasPermission($name):bool 
+    {
+        return $this->permissions()->where('name',$name)->exists();
+    }
+
+19 - Criar o Middleware EnsureIsAdmin e pubilicá-lo no 'alias' do Kernel
+
+20 - Travar as rotas de Administrador com o middleware 'admin'
+
+21 - criar a Policy para users e um método 'view'
+
+    sail artisan make:policy UserPolicy --model=User
+
+    public function view()
+    {
+        return Auth::user()->role->hasPermission('usuário-visualizar');
+    }
+
+22 - Travar no Menu Sidebar a parte de administrador com a policy
+
+     @can('view', App\Models\User::class)
+
+        <li>
+            ...
+        </li>
+        <li>
+            ...
+        </li>
+
+     @endcan
+
+23 - Para utilizar a Policy no Controller
+
+    $this->authorize('view',App\Models\User::class);
+
+
+19 - Scripts:
+
+** Visualizar a imagem a ser substituída
+
+<script>
+    $(document).ready(function() {
+        $('#image').change(function(e) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#showImage').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(e.target.files['0']);
+        });
+    });
+</script>
+
+** Modal para exclusão
+
+<script>
+    $(document).on('click', 'a', function(event) {
+        var value = $(this).attr('link');
+        $('#idModal').val(value);
+    });
+</script>
+
+** Toastr Mensagens
+
+<script>
+    
+        var type = "info"
+
+        $(document).ready(function() {
+            toastr.options = {
+                "progressBar": true,
+                "timeOut": "2800",
+                "positionClass": "toast-top-center"
+            }
+
+            switch (type) {
+
+                case 'info':
+                    toastr.info('Senha Alterada com Sucesso!');
+                    break;
+                case 'success':
+                    toastr.success('Senha Alterada com Sucesso!');
+                    break;
+                case 'warning':
+                    toastr.warning('Senha Alterada com Sucesso!');
+                    break;
+                case 'error':
+                    toastr.error('Senha Alterada com Sucesso!');
+                    break;
+
+            }
+
+        });
+</script>
+
